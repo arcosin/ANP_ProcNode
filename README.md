@@ -1,9 +1,1 @@
---------------------------------------------------------------------------------
-# Proc Node
---------------------------------------------------------------------------------
-
-A set of python tools for IPC over different mediums.
-
-Repo: https://github.com/arcosin/ProcNode
-
---------------------------------------------------------------------------------
+This branch is for TCP testing for multiprocessing.connection libraray
