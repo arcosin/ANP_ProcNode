@@ -1,14 +1,14 @@
-
 from queue import Queue, Empty
 from multiprocessing import Queue as MPQueue
 from multiprocessing.connection import Listener
 import socket
+from subprocess import getoutput
 
- 
 class Server:
 
     def __init__(self, port):
-        self.address = ((socket.gethostbyname(socket.gethostname()), port))
+        self.host = getoutput("hostname -I").split()[0]
+        self.address = ((self.host, port))
         self.port = port
         print("Sever Address: "+socket.gethostbyname(socket.gethostname())+":"+str(port))
         self.listener = Listener(self.address) 

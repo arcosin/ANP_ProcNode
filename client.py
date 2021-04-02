@@ -22,7 +22,7 @@ class Client:
             print("Server Connected")
         self.on = True
 
-    def stop(self):
+    def stop(self, disconnect = True):
         if disconnect:
             self.conn.close()
             self.conn = None
