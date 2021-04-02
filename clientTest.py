@@ -1,13 +1,16 @@
-import client , server
- 
+from client import Client
+from server import Server
+
 def main():
-    portno =  61619
-    id = "client"
-    host = "data.cs.purdue.edu"
-    message = "Message from client"
-    c1 = client.client(portno , id , host)
-    c1.sendMsg(message)
-    c1.receive()
+    host = "127.0.1.1"
+    port =  61619
+    c = Client(host, port)
+    c.start()
+    image = c.recv()
+    image.show()
+    c.send(b"Hi Server Image is well recieved")
+
+
     
 if __name__ == '__main__':
     main()

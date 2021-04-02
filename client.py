@@ -1,38 +1,42 @@
-import xmlrpc.client
-from collections import defaultdict
+
 from queue import Queue, Empty
 from multiprocessing import Queue as MPQueue
-import socket  # import socketserver preinstalled module
-import http.server
-from node import Node
+from multiprocessing.connection import Client as mClient
+import socket
 
-class client(Node):
-    
-    def __init__(self , port , id , host):
-        super().__init__(id)
-        self.portno = port
-        self.host = host
-
-     
-    def receive(self):
-        self.proxy = xmlrpc.client.ServerProxy("http://"+ self.host  +":"+str(self.portno)+"/")
-        print("Received from server")
-        with open("received_img.jpg", "wb") as handle:
-            handle.write((self.proxy.image()).data)  
  
+class Client:
 
-    def returnMsg(self):
-        return self.mssg
+    def __init__(self, host, port):
+        self.host = host
+        self.port = port
+        self.address = ((self.host, self.port))
+        print("Sever Address: "+host+":"+str(port))
+        self.conn = None
+        self.on = False
+
+    def start(self):
+        if self.conn == None:
+            print("Connecting to the server")
+            self.conn = mClient(self.address)
+            print("Server Connected")
+        self.on = True
+
+    def stop(self):
+        if disconnect:
+            self.conn.close()
+            self.conn = None
+        self.on = False
+    
+    def send(self, msg):
+        if self.on:
+            self.conn.send(msg)
+
+    def recv(self):
+        if self.on:
+            return self.conn.recv()
+    
+
 
     
-    def sendMsg(self , message):
-        HOST = 'data.cs.purdue.edu'
-        PORT = self.portno
-    
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-            sock.connect(( HOST, PORT))
-            print ("Yeah! I'm connected to  : " + str(self.host))
-            sock.sendall(bytes(message , 'utf-8'))
-            sock.close()
-           
-    
+

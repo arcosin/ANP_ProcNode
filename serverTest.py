@@ -1,13 +1,16 @@
-import  client , server
- 
+from client import Client
+from server import Server
+from PIL import Image
+
 def main():
-    print("start")
-    portno =  61619
+    port =  61619
+    s = Server(port)
+    s.start()
     name = "Naruto.jpg"
-    id = "Server"
-    s1 = server.Server( portno , name , id)
-    s1.createProxy()
-    s1.start()
+    image = Image.open(name)
+    s.send(image)
+    message = s.recv()
+    print("message from client: ",message)
 
 
     
