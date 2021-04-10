@@ -34,5 +34,3 @@ class client(Node):
             print ("Yeah! I'm connected to  : " + str(self.host))
             sock.sendall(bytes(message , 'utf-8'))
             sock.close()
-           
-    

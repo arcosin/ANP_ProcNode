@@ -2,7 +2,7 @@
 from collections import defaultdict
 from queue import Queue, Empty
 from multiprocessing import Queue as MPQueue
-import msg
+# import msg
 
 class NodeEmpty(Exception):
     pass
