@@ -28,7 +28,7 @@ def main():
 
     for frame in camera.capture_continuous(stream,'bgr',use_video_port=True): # https://picamera.readthedocs.io/en/release-1.13/recipes1.html?highlight=start_recording#capturing-to-a-network-stream
             image = frame.array
-            server.send(image)
+            server.send("client",image)
             stream.truncate(0)
     server.stop()
 if __name__ == '__main__':
