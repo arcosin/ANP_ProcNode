@@ -11,7 +11,7 @@ class Client:
         self.host = host
         self.port = port
         self.address = ((self.host, self.port))
-        print("Sever Address: "+host+":"+str(port))
+        print("Target Sever Address: "+host+":"+str(port))
         self.conn = None
         self.on = False
 

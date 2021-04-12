@@ -1,25 +1,33 @@
 from queue import Queue, Empty
 from multiprocessing import Queue as MPQueue
 from multiprocessing.connection import Listener
-import socket
+import socket, random
 from subprocess import getoutput
 
 class Server:
 
-    def __init__(self, port):
+    def __init__(self):
         self.host = getoutput("hostname -I").split()[0]
-        self.address = ((self.host, port))
-        self.port = port
-        print("Sever Address: "+socket.gethostbyname(socket.gethostname())+":"+str(port))
-        self.listener = Listener(self.address) 
+        while True:
+            try:
+                self.port = random.randint(1024,65536)
+                self.address = ((self.host, self.port))
+                self.listener = Listener(self.address) 
+                break
+            except:
+                continue
+        print("Sever Address:",self.host,":",self.port)
         self.conn = None
+        self.wait = False
+        self.on = False
 
     def start(self):
-        if self.conn == None:
+        if self.conn == None and self.wait == False:
             print("Start Waiting for Client")
+            self.wait = True
             self.conn = self.listener.accept()
+            self.wait = False
             print("Client Connected from: ",self.listener.last_accepted)
-            
         self.on = True
 
     def stop(self, disconnect = True):

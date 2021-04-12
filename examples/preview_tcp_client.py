@@ -1,11 +1,13 @@
-from client import Client
-from server import Server
+import sys
+sys.path.append("..")
+from proc_node import TCPNode
 import cv2
 
 def main():
     host = "192.168.0.102"
     port =  6000
-    client = Client(host, port)
+    client = TCPNode("client", False)
+    client.connectTCP("server",host,port)
     client.start()
     while(True):
         image = client.recv()

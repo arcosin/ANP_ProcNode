@@ -1,5 +1,6 @@
-from client import Client
-from server import Server
+import sys
+sys.path.append("..")
+from proc_node import TCPNode
 from PIL import Image
 import time
 import picamera
@@ -7,8 +8,7 @@ from picamera.array import PiRGBArray
 import cv2
 
 def main():
-    port =  6000
-    server = Server(port)
+    server = TCPNode("server",True)
     server.start()
     width=480
     height=480
@@ -30,7 +30,7 @@ def main():
             image = frame.array
             server.send(image)
             stream.truncate(0)
-    
+    server.stop()
 if __name__ == '__main__':
     main()
 
