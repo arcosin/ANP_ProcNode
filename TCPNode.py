@@ -5,24 +5,27 @@ from queue import Queue, Empty
 from multiprocessing import Queue as MPQueue
 from node import Node
 import socket
-import client , server
+import client , server, filename
 
 
 class TCPNode(Node):
     
-    def __init__(self, id , name , type ,port):
+    def __init__(self, id , object , type ,port):
         super().__init__(id)
         self.portno = 61619
         self.type = type
-        self.item = name
+        self.rname = filename.filename
+        if (self.type == "server"):
+            self.item = object.attribute
+        
         self.host = 'data.cs.purdue.edu'
 
-    def image(self):
+    def reader(self):
         with open(self.item, "rb") as handle:
             return handle.read()
 
     def createProxy(self):
-        self.server.register_function(self.image, 'image')
+        self.server.register_function(self.reader, 'reader')
 
     def serverStart(self):    
         self.msgQueue = Queue()
@@ -35,19 +38,18 @@ class TCPNode(Node):
         Turn on (deploy) the node.
     '''
     def start(self):
-        if self.type == "server":
-            self.server = SimpleXMLRPCServer(("data.cs.purdue.edu", self.portno))
-            self.createProxy()
-            print("Listening on port "+str(self.portno)+" ...")
-            self.server.serve_forever()
-       
-        elif self.type == "client":
-            self.proxy = xmlrpc.client.ServerProxy("http://"+ self.host  +":"+str(self.portno)+"/")
-           
-        
-        else:
-            super().start()
+        super().start()
 
+
+    def startTCPServer(self):
+        self.server = SimpleXMLRPCServer(("data.cs.purdue.edu", self.portno))
+        self.createProxy()
+        print("Listening on port "+str(self.portno)+" ...")
+        self.server.serve_forever()
+
+    def startTCPClient(self):
+        self.proxy = xmlrpc.client.ServerProxy("http://"+ self.host  +":"+str(self.portno)+"/")
+    
 
     '''
         Turn off (undeploy) the node.
@@ -150,11 +152,12 @@ class TCPNode(Node):
             self.proxy = xmlrpc.client.ServerProxy("http://"+ self.host  +":"+str(self.portno)+"/")
             print("Received from server")
             with open("received_img.jpg", "wb") as handle:
-                handle.write((self.proxy.image()).data)  
+                handle.write((self.proxy.reader()).data)  
         
         elif self.type == "client":
-            with open("received_img.jpg", "wb") as handle:
-                handle.write((self.proxy.image()).data)
+            # ob = (self.proxy.reader()).data
+            with open(self.rname, "wb") as handle:
+                handle.write((self.proxy.reader()).data)
  
         else:
             super().recv(block = block)
