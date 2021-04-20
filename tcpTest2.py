@@ -5,12 +5,12 @@ def main():
     print("start")
     portno =  61619
     name = ""
-    type = "client"
+    type = "TCP"
     id = "B"
     s1 = TCPNode.TCPNode(id , name, type, portno)
-    s1.startTCPClient()
+    # s1.serverStart()
     s1.recv()
-
+    
 
 
     

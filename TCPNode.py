@@ -15,24 +15,21 @@ class TCPNode(Node):
         self.portno = 61619
         self.type = type
         self.rname = filename.filename
-        if (self.type == "server"):
-            self.item = object.attribute
-        
         self.host = 'data.cs.purdue.edu'
+        self.object = object
 
     def reader(self):
-        with open(self.item, "rb") as handle:
-            return handle.read()
+        return self.object
 
     def createProxy(self):
         self.server.register_function(self.reader, 'reader')
 
+   
     def serverStart(self):    
-        self.msgQueue = Queue()
-        self.on = True
         self.server = SimpleXMLRPCServer(("data.cs.purdue.edu", self.portno))
+        self.createProxy()
         print("Listening on port "+str(self.portno)+" ...")
-        self.server.serve_forever()
+        self.server.handle_request()
 
     '''
         Turn on (deploy) the node.
@@ -43,9 +40,9 @@ class TCPNode(Node):
 
     def startTCPServer(self):
         self.server = SimpleXMLRPCServer(("data.cs.purdue.edu", self.portno))
-        self.createProxy()
-        print("Listening on port "+str(self.portno)+" ...")
-        self.server.serve_forever()
+        # self.createProxy()
+        # print("Listening on port "+str(self.portno)+" ...")
+        # self.server.handle_request()
 
     def startTCPClient(self):
         self.proxy = xmlrpc.client.ServerProxy("http://"+ self.host  +":"+str(self.portno)+"/")
@@ -61,22 +58,22 @@ class TCPNode(Node):
         Connect an undeployed node to this one directly through memory.
         If duplex is true, the given node will also be connected to this one.
     '''
-    def connectTCP(self, id, host, port):                                       #TODO: add code to connect to a remote TCPNode at host:port.
+    def connectTCP(self, node):                                       #TODO: add code to connect to a remote TCPNode at host:port.
         self._connectConn(node)
 
                                                                                 #      Store info in self.conns dict to map the id to the connection object.
                                                                                 #      Make sure you can internally distinguish between tcp and local conns.
-
+ 
    
     def _connectConn(self, node):
         connRec = self._buildConnRec(node)
         self.conns[node.id] = connRec
         
     
-    def _buildConnRec(self, node , type):
+    def _buildConnRec(self, node ):
         connRec = dict()
         connRec["line"] = node.inputLine
-        connRec["type"] = type
+        connRec["type"] = node.type
         return connRec
    
 
@@ -84,30 +81,18 @@ class TCPNode(Node):
         self._checkNodeOn()
         try:
             connRec = self.conns[id]
-            self._send(connRec, Msg("msg", msg))
+            self._send(connRec, msg)
         except KeyError:
             raise ValueError("[ProcNode]: Error. ID %s not found." % str(id))
 
-    
+
     def _send(self, connRec, msg):
-        if connRec["type"] == "server":
-            HOST = 'data.cs.purdue.edu'
-            PORT = self.portno
-            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-                sock.connect(( HOST, PORT))
-                print ("Yeah! I'm connected to  : " + str(self.host))
-                sock.sendall(bytes(message , 'utf-8'))
-                sock.close()
+        if connRec["type"] == "TCP":
+            self.object = msg
+            self.createProxy()
+            print("Listening on port "+str(self.portno)+" ...")
+            self.server.handle_request()
         
-        if connRec["type"] == "client":
-            HOST = 'data.cs.purdue.edu'
-            PORT = self.portno
-            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-                sock.connect(( HOST, PORT))
-                print ("Yeah! I'm connected to  : " + str(self.host))
-                sock.sendall(bytes(message , 'utf-8'))
-                sock.close()
-            
         else:
             connRec["line"].put(msg)
     '''
@@ -147,20 +132,19 @@ class TCPNode(Node):
         If block is false, recv will finish updating and either return a found msg or raise Empty.
     '''
     def recv(self, block = True):                                               #TODO: Implement for super version and tcp nodes.
-        
-        if self.type == "server":
+        print("IN NODE :"+str(self.id))
+        flag = 0
+        if self.type == "TCP":
             self.proxy = xmlrpc.client.ServerProxy("http://"+ self.host  +":"+str(self.portno)+"/")
-            print("Received from server")
-            with open("received_img.jpg", "wb") as handle:
-                handle.write((self.proxy.reader()).data)  
-        
-        elif self.type == "client":
-            # ob = (self.proxy.reader()).data
-            with open(self.rname, "wb") as handle:
-                handle.write((self.proxy.reader()).data)
- 
+            print(self.proxy.reader())
+              
+
         else:
             super().recv(block = block)
+
+
+
+
 
 
 
