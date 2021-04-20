@@ -20,6 +20,7 @@ def main():
     id = "A"
     s1 = TCPNode.TCPNode(id , I1, type, portno)
     s1.serverStart()
+    # s1.serverStart()
     # s1.recv()
 
 

@@ -5,14 +5,15 @@ from queue import Queue, Empty
 from multiprocessing import Queue as MPQueue
 from node import Node
 import socket
-import client , server, filename
+import client , server, filename , CustomObject as c1
+from collections import namedtuple
 
 
 class TCPNode(Node):
     
     def __init__(self, id , object , type ,port):
         super().__init__(id)
-        self.portno = 61619
+        self.portno = port
         self.type = type
         self.rname = filename.filename
         self.host = 'data.cs.purdue.edu'
@@ -26,7 +27,7 @@ class TCPNode(Node):
 
    
     def serverStart(self):    
-        self.server = SimpleXMLRPCServer(("data.cs.purdue.edu", self.portno))
+        self.server = SimpleXMLRPCServer((self.host, self.portno))
         self.createProxy()
         print("Listening on port "+str(self.portno)+" ...")
         self.server.handle_request()
@@ -136,7 +137,11 @@ class TCPNode(Node):
         flag = 0
         if self.type == "TCP":
             self.proxy = xmlrpc.client.ServerProxy("http://"+ self.host  +":"+str(self.portno)+"/")
-            print(self.proxy.reader())
+            dictionary = self.proxy.reader()
+            a1 = c1.CustomObject(**dictionary) 
+            print(a1.returnList())
+            print(a1.returnStr())
+            print(a1.returnDic())
               
 
         else:
